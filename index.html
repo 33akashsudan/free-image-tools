@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free Image Tools – 100% Free</title>
+  <meta name="description" content="Compress, convert, resize, and crop images directly in your browser." />
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --panel: rgba(255,255,255,.04);
+      --panel2: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --soft: rgba(255,255,255,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 14px;
+      --max: 1120px;
+    }
+
+    *{ box-sizing: border-box; }
+    html{ scroll-behavior: smooth; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(125, 211, 252, .12), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 10%, rgba(167, 139, 250, .12), transparent 55%),
+                  radial-gradient(900px 650px at 50% 120%, rgba(34, 211, 238, .08), transparent 55%),
+                  var(--bg);
+      line-height: 1.45;
+    }
+
+    /* Subtle noise */
+    body:before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+      opacity: .35;
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    .wrap{ max-width: var(--max); margin: 0 auto; padding: 28px 20px 64px; position: relative; }
+
+    /* Top bar */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(11,15,20,.6);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .topbar{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 220px;
+    }
+    .logo{
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(125,211,252,.35), rgba(167,139,250,.35));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      position: relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset: 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .brand-title{
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .brand-title strong{ font-size: 14px; letter-spacing: .4px; }
+    .brand-title span{ font-size: 12px; color: var(--muted); }
+
+    nav{
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .navlink{
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all .18s ease;
+    }
+    .navlink:hover{
+      color: var(--text);
+      border-color: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* Hero */
+    .hero{
+      padding: 52px 0 26px;
+    }
+    .hero-card{
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border-radius: calc(var(--radius) + 6px);
+      padding: 34px 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card:before{
+      content:"";
+      position:absolute;
+      width: 560px; height: 560px;
+      left: -280px; top: -320px;
+      background: radial-gradient(circle at 30% 35%, rgba(125,211,252,.18), transparent 60%);
+      filter: blur(0px);
+    }
+    .hero-card:after{
+      content:"";
+      position:absolute;
+      width: 520px; height: 520px;
+      right: -260px; top: -330px;
+      background: radial-gradient(circle at 60% 30%, rgba(167,139,250,.18), transparent 60%);
+    }
+
+    h1{
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.6px;
+      position: relative;
+      z-index: 1;
+    }
+    .subtitle{
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(14px, 2vw, 16px);
+      max-width: 62ch;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Tool cards */
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+    }
+    .tool{
+      grid-column: span 6;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 18px 16px;
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .tool:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.14);
+    }
+    .tool-top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 12px;
+    }
+    .tool h3{
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: .2px;
+    }
+    .tool p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 40ch;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .dot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.35);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.06);
+    }
+
+    /* Sections */
+    main{ margin-top: 26px; }
+    section{
+      margin-top: 16px;
+      padding: 22px 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    section h2{
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.2px;
+    }
+    .section-desc{
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 80ch;
+    }
+
+    .placeholder{
+      border-radius: var(--radius2);
+      border: 1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      padding: 16px;
+      color: rgba(255,255,255,.70);
+      font-size: 13px;
+    }
+    .placeholder ul{
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+    .placeholder li{ margin: 6px 0; }
+
+    .backtop{
+      display: inline-flex;
+      margin-top: 14px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      transition: all .18s ease;
+    }
+    .backtop:hover{
+      color: var(--text);
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.14);
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      display: flex;
+      justify-content: center;
+    }
+    .footer-inner{
+      width: 100%;
+      max-width: var(--max);
+      padding: 0 20px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-links{
+      display:flex; gap: 12px; flex-wrap: wrap; align-items:center;
+    }
+    .footer-links a{
+      color: rgba(255,255,255,.58);
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+    }
+    .footer-links a:hover{
+      color: rgba(255,255,255,.82);
+      border-bottom-color: rgba(255,255,255,.18);
+    }
+
+    /* Responsive */
+    @media (max-width: 860px){
+      .tool{ grid-column: span 12; }
+      .brand{ min-width: unset; }
+      nav{ justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brand-title">
+          <strong>Free Image Tools</strong>
+          <span>Simple. Free. In-browser.</span>
+        </div>
+      </div>
+      <nav aria-label="Tool navigation">
+        <a class="navlink" href="#compressor">Compressor</a>
+        <a class="navlink" href="#converter">Converter</a>
+        <a class="navlink" href="#resize">Resize</a>
+        <a class="navlink" href="#crop">Crop</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap" id="top">
+    <div class="hero">
+      <div class="hero-card">
+        <h1>Free Image Tools – 100% Free</h1>
+        <p class="subtitle">Compress, convert, resize, and crop images directly in your browser.</p>
+
+        <div class="grid" aria-label="Tools">
+          <a class="tool" href="#compressor">
+            <div class="tool-top">
+              <div>
+                <h3>Image Compressor</h3>
+                <p>Reduce file size while keeping your image looking sharp.</p>
+              </div>
+              <span class="chip"><span class="dot"></span>Tool</span>
+            </div>
+          </a>
+
+          <a class="tool" href="#converter">
+            <div class="tool-top">
+              <div>
+                <h3>Image Converter</h3>
+                <p>Switch formats like JPG, PNG, and WebP in seconds.</p>
+              </div>
+              <span class="chip"><span class="dot"></span>Tool</span>
+            </div>
+          </a>
+
+          <a class="tool" href="#resize">
+            <div class="tool-top">
+              <div>
+                <h3>Resize Image</h3>
+                <p>Adjust width/height precisely for web or social.</p>
+              </div>
+              <span class="chip"><span class="dot"></span>Tool</span>
+            </div>
+          </a>
+
+          <a class="tool" href="#crop">
+            <div class="tool-top">
+              <div>
+                <h3>Crop Image</h3>
+                <p>Trim your image cleanly to the exact frame you need.</p>
+              </div>
+              <span class="chip"><span class="dot"></span>Tool</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <section id="compressor" aria-labelledby="compressor-title">
+        <h2 id="compressor-title">Image Compressor</h2>
+        <p class="section-desc">A clean space for an in-browser compressor UI (static layout only).</p>
+        <div class="placeholder">
+          <strong>Placeholder layout</strong>
+          <ul>
+            <li>Drop zone / file picker</li>
+            <li>Quality slider + target size option</li>
+            <li>Preview (before/after) + download button</li>
+          </ul>
+        </div>
+        <a class="backtop" href="#top">Back to top</a>
+      </section>
+
+      <section id="converter" aria-labelledby="converter-title">
+        <h2 id="converter-title">Image Converter</h2>
+        <p class="section-desc">A section for converting image formats (static layout only).</p>
+        <div class="placeholder">
+          <strong>Placeholder layout</strong>
+          <ul>
+            <li>Upload area</li>
+            <li>Format selector (JPG / PNG / WebP)</li>
+            <li>Preview + download output</li>
+          </ul>
+        </div>
+        <a class="backtop" href="#top">Back to top</a>
+      </section>
+
+      <section id="resize" aria-labelledby="resize-title">
+        <h2 id="resize-title">Resize Image</h2>
+        <p class="section-desc">A section for setting exact dimensions (static layout only).</p>
+        <div class="placeholder">
+          <strong>Placeholder layout</strong>
+          <ul>
+            <li>Width / height inputs</li>
+            <li>Maintain aspect ratio toggle</li>
+            <li>Preview + download resized image</li>
+          </ul>
+        </div>
+        <a class="backtop" href="#top">Back to top</a>
+      </section>
+
+      <section id="crop" aria-labelledby="crop-title">
+        <h2 id="crop-title">Crop Image</h2>
+        <p class="section-desc">A section for cropping to a selected area or preset ratio (static layout only).</p>
+        <div class="placeholder">
+          <strong>Placeholder layout</strong>
+          <ul>
+            <li>Upload area</li>
+            <li>Crop frame + aspect ratio presets</li>
+            <li>Preview + download cropped image</li>
+          </ul>
+        </div>
+        <a class="backtop" href="#top">Back to top</a>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>© Free Image Tools</div>
+      <div class="footer-links" aria-label="Footer links">
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Minimal placeholders to keep footer links on the same page (no extra pages) -->
+  <div class="wrap" style="padding-top: 0; padding-bottom: 34px;">
+    <section id="privacy" aria-labelledby="privacy-title">
+      <h2 id="privacy-title">Privacy</h2>
+      <p class="section-desc">Placeholder text. Replace with your privacy policy.</p>
+    </section>
+
+    <section id="terms" aria-labelledby="terms-title">
+      <h2 id="terms-title">Terms</h2>
+      <p class="section-desc">Placeholder text. Replace with your terms of use.</p>
+    </section>
+  </div>
+</body>
+</html>
