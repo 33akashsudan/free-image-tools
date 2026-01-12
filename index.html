@@ -386,6 +386,14 @@
     <main>
       <section id="compressor" aria-labelledby="compressor-title">
         <h2 id="compressor-title">Image Compressor</h2>
+        <h2 id="compressor-title">Image Compressor</h2>
+
+<input type="file" id="compressInput" accept="image/*">
+<br><br>
+<button onclick="compressImage()">Compress Image</button>
+<br><br>
+<a id="downloadLink" style="display:none;">Download Compressed Image</a>
+
         <p class="section-desc">A clean space for an in-browser compressor UI (static layout only).</p>
         <div class="placeholder">
           <strong>Placeholder layout</strong>
@@ -464,5 +472,43 @@
       <p class="section-desc">Placeholder text. Replace with your terms of use.</p>
     </section>
   </div>
+  <script>
+function compressImage() {
+  const input = document.getElementById('compressInput');
+  if (!input || !input.files.length) {
+    alert('Please select an image first');
+    return;
+  }
+
+  const file = input.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    const img = new Image();
+    img.src = e.target.result;
+
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.getElementById('downloadLink');
+        link.href = url;
+        link.download = 'compressed.jpg';
+        link.style.display = 'inline';
+        link.textContent = 'Download Compressed Image';
+      }, 'image/jpeg', 0.6);
+    };
+  };
+
+  reader.readAsDataURL(file);
+}
+</script>
+
 </body>
 </html>
